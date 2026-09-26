@@ -1,0 +1,472 @@
+## 1. Schema inspection
+--- S1 (train) (2,206,821 sampled rows) ---
+Columns: ['entity_id', 'business_name', 'business_address', 'country']
+entity_id           str
+business_name       str
+business_address    str
+country             str
+dtype: object
+
+Missing rates:
+entity_id           0.0
+business_name       0.0
+business_address    0.0
+country             0.0
+
+--- S2 (train) (5,034,616 sampled rows) ---
+Columns: ['entity_id', 'business_name', 'business_address', 'country']
+entity_id           str
+business_name       str
+business_address    str
+country             str
+dtype: object
+
+Missing rates:
+entity_id           0.000000e+00
+business_name       3.972498e-07
+business_address    3.356105e-02
+country             0.000000e+00
+
+--- S3 (train) (5,285,603 sampled rows) ---
+Columns: ['entity_id', 'business_name', 'business_address', 'country']
+entity_id           str
+business_name       str
+business_address    str
+country             str
+dtype: object
+
+Missing rates:
+entity_id           0.000000
+business_name       0.000002
+business_address    0.033282
+country             0.000000
+
+## 2. Country distribution
+
+S1 country distribution:
+country
+US       1323633
+India     883188
+
+S2 country distribution:
+country
+US       3016817
+India    2017799
+
+S3 country distribution:
+country
+US       3170056
+India    2115547
+
+## 3. Character-set profiling — fully dynamic Unicode script discovery
+
+### 3a. Character-level inventory
+
+We make **no assumptions** about which scripts exist. We scan every unique
+non-ASCII character and use `unicodedata.name()` to extract the script/block
+family automatically. No predefined list.
+
+
+S1 -- Unicode script/block inventory (0 families found):
+Empty DataFrame
+Columns: []
+Index: []
+
+S2 -- Unicode script/block inventory (11 families found):
+script/block  distinct_chars         samples
+   MALAYALAM              54 ം ോ സ ൂ ഐ ഹ ഫ ഴ
+  DEVANAGARI              46 ष ई र ॐ प न ट च
+     KANNADA              46 ಐ ಹ ದ ್ ಾ ಕ ೋ ಿ
+    GUJARATI              45 ઈ ઇ ચ થ ા ુ પ ડ
+      TELUGU              45 గ ద ప ా ి ఐ డ ృ
+    GURMUKHI              44 ਤ ਨ ਼ ੱ ਰ ੈ ੰ ਚ
+       ORIYA              44 ୍ ଜ ପ ଡ ଉ ଂ ଇ ଓ
+     BENGALI              42 ৈ এ ল থ ঞ ূ ু শ
+       TAMIL              41 ஹ இ ஈ ந ர ஷ ை ங
+       LATIN              10 í Á á É ú ó Ó Í
+        ZERO               1               ‌
+
+S3 -- Unicode script/block inventory (11 families found):
+script/block  distinct_chars         samples
+   MALAYALAM              54 ം ോ സ ൂ ഐ ഹ ഫ ഴ
+  DEVANAGARI              46 ष ई र ॐ प न ट ँ
+     KANNADA              46 ಐ ಹ ದ ್ ಾ ಕ ೋ ಿ
+    GUJARATI              45 ઈ ઇ ચ થ ા ુ પ ડ
+      TELUGU              45 గ ద ప ా ి ఐ డ ృ
+    GURMUKHI              44 ਤ ਨ ਼ ੱ ਰ ੈ ੰ ਚ
+       ORIYA              44 ୍ ଜ ପ ଡ ଉ ଂ ଇ ଓ
+     BENGALI              42 ৈ এ ল থ ঞ ূ ু শ
+       TAMIL              41 ஹ இ ஈ ந ர ஷ ை ங
+       LATIN              10 í Á á É ú ó Ó Í
+        ZERO               1               ‌
+
+### 3b. Record-level script classifier (fully dynamic)
+
+Uses `unicodedata.category()` (Unicode standard) to identify **letters/marks**
+(script-bearing) vs punctuation/symbols/digits (structural).
+Then `unicodedata.name()` extracts the script.
+
+Only assumption: `LATIN` is the baseline. Everything else is discovered.
+**No hardcoded script list whatsoever.**
+
+
+S1: 0 / 2,206,821 (0.00%) records contain non-Latin script chars
+  Discovered non-Latin scripts (records containing each):
+  Mixed non-Latin script records (2+ scripts in one name): 0
+
+S2: 474,345 / 5,034,616 (9.42%) records contain non-Latin script chars
+  Discovered non-Latin scripts (records containing each):
+    DEVANAGARI          : 269,424
+    TELUGU              :  39,323
+    KANNADA             :  37,211
+    TAMIL               :  33,781
+    GUJARATI            :  30,929
+    BENGALI             :  30,723
+    MALAYALAM           :  18,773
+    ORIYA               :   7,493
+    GURMUKHI            :   6,688
+  Mixed non-Latin script records (2+ scripts in one name): 0
+
+S3: 278,524 / 5,285,603 (5.27%) records contain non-Latin script chars
+  Discovered non-Latin scripts (records containing each):
+    DEVANAGARI          : 158,003
+    TELUGU              :  23,033
+    KANNADA             :  21,995
+    TAMIL               :  19,790
+    BENGALI             :  18,144
+    GUJARATI            :  18,020
+    MALAYALAM           :  11,116
+    ORIYA               :   4,317
+    GURMUKHI            :   4,106
+  Mixed non-Latin script records (2+ scripts in one name): 0
+
+## 4. Token frequency analysis — top tokens & legal suffix inventory
+
+
+S1 -- Top 30 business_name tokens:
+[('limited', 522340), ('private', 432503), ('llc', 355736), ('inc', 238309), ('ltd', 148599), ('pvt', 121462), ('india', 61241), ('and', 57296), ('s', 55791), ('c', 54031), ('care', 53136), ('l', 49410), ('of', 44497), ('associates', 42985), ('group', 40520), ('llp', 39726), ('center', 35433), ('partners', 35084), ('corp', 34792), ('services', 31242), ('p', 29137), ('health', 28264), ('d', 28059), ('co', 27692), ('clinic', 27586), ('pc', 27166), ('solutions', 26415), ('global', 25611), ('trading', 22806), ('international', 20843)]
+  Total unique tokens: 108,857
+
+S2 -- Top 30 business_name tokens:
+[('llc', 532379), ('limited', 532213), ('private', 532080), ('inc', 403242), ('ltd', 401133), ('com', 202143), ('l', 200498), ('center', 196536), ('pvt', 190499), ('s', 155701), ('partners', 155487), ('c', 148164), ('services', 147345), ('corp', 142833), ('group', 141459), ('co', 140923), ('and', 118901), ('india', 114479), ('holdings', 97736), ('of', 89957), ('care', 89803), ('associates', 74002), ('p', 68787), ('llp', 65179), ('corporation', 63182), ('d', 60332), ('m', 58897), ('service', 55790), ('health', 51747), ('enterprises', 49677)]
+  Total unique tokens: 795,770
+
+S3 -- Top 30 business_name tokens:
+[('limited', 677666), ('private', 644518), ('llc', 575634), ('ltd', 430703), ('inc', 422989), ('center', 223999), ('pvt', 221763), ('com', 211902), ('l', 197364), ('services', 168980), ('s', 167412), ('partners', 164945), ('c', 149959), ('group', 146710), ('co', 145242), ('corp', 141308), ('and', 122990), ('india', 116712), ('holdings', 99784), ('care', 96856), ('of', 93125), ('a', 91435), ('d', 83946), ('llp', 77774), ('associates', 77468), ('p', 73062), ('m', 64867), ('service', 64578), ('corporation', 58592), ('enterprises', 57244)]
+  Total unique tokens: 847,985
+Unique suffixes found: 50
+limited               1,407,293
+llc                   1,153,852
+ltd                     713,826
+inc                     644,229
+corp                    242,921
+private                 228,748
+co                      219,667
+services                203,559
+partners                199,729
+group                   187,473
+llp                     141,145
+holdings                124,934
+corporation             110,897
+lp                       93,710
+company                  55,388
+pllc                     55,177
+pvt                      51,787
+clinic                   48,609
+enterprises              31,297
+trust                    28,309
+ventures                 23,723
+industries               22,847
+society                  19,546
+foundation               18,954
+solutions                15,996
+school                   14,623
+institute                12,851
+association              12,744
+technologies             12,214
+academy                  11,965
+international            10,490
+hospital                  8,911
+college                   8,426
+capital                   6,647
+media                     5,833
+consulting                5,297
+labs                      5,289
+tech                      4,170
+sa                          105
+sl                           53
+ag                           32
+bv                           28
+gmbh                         20
+university                   17
+ngo                          12
+sas                           9
+pty                           8
+plc                           3
+srl                           2
+sci                           1
+
+
+S1 -- Legal suffix distribution:
+business_name
+NaN            704679
+limited        521915
+llc            355736
+inc            190223
+ltd            122056
+llp             39725
+corp            33761
+group           32678
+co              25178
+pllc            20531
+partners        19351
+clinic          18107
+lp              16477
+corporation     13540
+company         12316
+trust            9924
+holdings         8309
+society          7024
+school           5913
+foundation       5313
+
+S2 -- Legal suffix distribution:
+business_name
+NaN            2821055
+limited         389262
+llc             381300
+ltd             286395
+inc             218146
+private         111811
+corp            105338
+co               97798
+services         92007
+partners         85395
+group            75948
+holdings         57885
+corporation      50886
+llp              46289
+lp               39789
+pvt              25242
+company          21522
+pllc             15911
+clinic           14144
+enterprises      12541
+
+S3 -- Legal suffix distribution:
+business_name
+NaN            2837940
+limited         496116
+llc             416816
+ltd             305375
+inc             235860
+private         116792
+services        107235
+corp            103822
+co               96691
+partners         94983
+group            78847
+holdings         58740
+llp              55131
+corporation      46471
+lp               37444
+pvt              26545
+company          21550
+pllc             18735
+clinic           16358
+enterprises      15544
+
+## 5. Regex noise scans with counts
+
+S1 -- Noise pattern scan on business_name (n=2,206,821):
+  hashtag_prefix        :   1,505 ( 0.07%)  e.g. '#4 Presidio'
+  appended_digits       :       2 ( 0.00%)  e.g. 'Swastik Finvest-Chennai 600008'
+  duplicate_adj_word    :   2,741 ( 0.12%)  e.g. 'Surgical Clinic Clinic'
+  null_literal          :      20 ( 0.00%)  e.g. 'Leblanc, Null & Mohl Arbor LLC'
+  all_caps_word         :  20,531 ( 0.93%)  e.g. 'Liberty Family Office PLLC'
+  dba_alias             :       6 ( 0.00%)  e.g. 'Dba Construction Pvt Ltd'
+  parenthetical_sfx     :       5 ( 0.00%)  e.g. 'Hind (private) Private Limited'
+  leetspeak_digit       :     605 ( 0.03%)  e.g. '24HR Towing'
+
+S2 -- Noise pattern scan on business_name (n=5,034,616):
+  hashtag_prefix        :  17,779 ( 0.35%)  e.g. '#hanumaneducational'
+  appended_digits       :  29,356 ( 0.58%)  e.g. 'Diamond Star Works L.L.C. - 7149969359'
+  url_in_name           : 176,144 ( 3.50%)  e.g. 'SHIVSHAKTI VIDYALAYA VIDYALAYA OVERSEAS CORPORATION | www.shivshakti.com'
+  duplicate_adj_word    : 101,837 ( 2.02%)  e.g. 'SHIVSHAKTI VIDYALAYA VIDYALAYA OVERSEAS CORPORATION | www.shivshakti.com'
+  extra_whitespace      : 554,392 (11.01%)  e.g. 'FOUNDATION EXCEL AGENCY PRIVATE  LIMITED'
+  null_literal          :      48 ( 0.00%)  e.g. 'Null Medical'
+  angle_brackets        :  15,776 ( 0.31%)  e.g. '>> Astro Handlooms'
+  all_caps_word         : 1,001,487 (19.89%)  e.g. 'SHIVSHAKTI VIDYALAYA VIDYALAYA OVERSEAS CORPORATION | www.shivshakti.com'
+  dba_alias             :      16 ( 0.00%)  e.g. 'Smith Smith Dba of Denning'
+  parenthetical_sfx     :  66,199 ( 1.31%)  e.g. 'Sweet Barbershop (Co)'
+  accent_anomaly        : 290,263 ( 5.77%)  e.g. 'Animal Welfare Nétwork'
+  pipe_separator        :  15,592 ( 0.31%)  e.g. 'SHIVSHAKTI VIDYALAYA VIDYALAYA OVERSEAS CORPORATION | www.shivshakti.com'
+  leetspeak_digit       : 139,494 ( 2.77%)  e.g. '[INCORPORATED] PEAK TRADIN6 NETWORKS SOUTHSIDE'
+
+S3 -- Noise pattern scan on business_name (n=5,285,603):
+  hashtag_prefix        :  18,718 ( 0.35%)  e.g. '#centraleducation'
+  appended_digits       :  30,136 ( 0.57%)  e.g. 'Cardiology Heartland Cáre Associates #98825'
+  url_in_name           : 184,706 ( 3.49%)  e.g. 'wilfordhancock.com'
+  duplicate_adj_word    : 106,921 ( 2.02%)  e.g. 'FERRERO FERRERO DUKE'
+  extra_whitespace      : 575,616 (10.89%)  e.g. 'The Rapid  Learning Alliance LLC'
+  null_literal          :      34 ( 0.00%)  e.g. 'Null Industries'
+  angle_brackets        :  16,212 ( 0.31%)  e.g. '>> First  Consultants Private [Limited]'
+  all_caps_word         : 181,756 ( 3.44%)  e.g. 'FERRERO FERRERO DUKE'
+  dba_alias             :  31,629 ( 0.60%)  e.g. 'Ectolumdrex dba X+ Madison Inc'
+  parenthetical_sfx     :  76,128 ( 1.44%)  e.g. 'The Consultants Karnataka Cotex (Limited)'
+  accent_anomaly        : 328,213 ( 6.21%)  e.g. 'LLC Moncada Léarning Center'
+  pipe_separator        :  16,526 ( 0.31%)  e.g. 'M/s Basera Advisors  Group | www.baseraadv.com'
+  leetspeak_digit       : 149,863 ( 2.84%)  e.g. 'Center 5uperior Co'
+
+
+S1 -- Address noise scan (n=2,206,821):
+  null_literal        :      43 ( 0.00%)
+  po_box              :      15 ( 0.00%)
+  all_caps            :       4 ( 0.00%)
+  reordered_addr      :  84,634 ( 3.84%)
+  empty               :       0 ( 0.00%)
+  non_latin_chars     :     554 ( 0.03%)
+
+S2 -- Address noise scan (n=5,034,616):
+  null_literal        : 131,794 ( 2.62%)
+  po_box              :  50,273 ( 1.00%)
+  all_caps            : 2,598,431 (51.61%)
+  reordered_addr      : 191,054 ( 3.79%)
+  empty               : 168,967 ( 3.36%)
+  non_latin_chars     : 478,453 ( 9.50%)
+
+S3 -- Address noise scan (n=5,285,603):
+  null_literal        : 130,844 ( 2.48%)
+  po_box              :  49,818 ( 0.94%)
+  all_caps            :     408 ( 0.01%)
+  reordered_addr      :  76,508 ( 1.45%)
+  empty               : 175,916 ( 3.33%)
+  non_latin_chars     : 476,588 ( 9.02%)
+
+## 6. Missing field rates by country
+
+S1 -- address missing rate by country:
+         empty    total  pct_empty
+country                           
+India        0   883188        0.0
+US           0  1323633        0.0
+
+S2 -- address missing rate by country:
+          empty    total  pct_empty
+country                            
+India     57846  2017799   0.028668
+US       111121  3016817   0.036834
+
+S3 -- address missing rate by country:
+          empty    total  pct_empty
+country                            
+India     64948  2115547   0.030700
+US       110968  3170056   0.035005
+
+## 7. Cross-script match analysis (ground truth pairs)
+
+Quantifies how many ground-truth (S1, S2/S3) pairs involve a script mismatch.
+Uses `detect_scripts_dynamic()` from Section 3b — fully data-driven.
+
+Loading ground truth sample ...
+  train_ground_truth.tsv: 2,206,821 rows  ->  sampling 50,000
+  Loaded 50,000 GT rows
+  Columns: ['source1_entity_id', 'matched_entity_ids']
+
+  Singletons (no match): 2,847 / 50,000 (5.69%)
+
+  Match count distribution (non-singletons):
+matched_entity_ids
+1      2698
+2      8600
+3     11919
+4     10936
+5      7210
+6      3759
+7      1486
+8       435
+9        96
+10       11
+11        3
+  Avg matches per non-singleton: 3.67
+  Max matches: 11
+
+Cross-script pairs: 12,557 / 172,892 (7.26%)
+  (note: limited by sampled lookups -- not all matched IDs may be in sample)
+
+  Top cross-script pair types:
+    S1:['LATIN'] <-> S2/S3:['DEVANAGARI']  -- 7,120 pairs
+    S1:['LATIN'] <-> S2/S3:['TELUGU']  -- 1,116 pairs
+    S1:['LATIN'] <-> S2/S3:['KANNADA']  -- 957 pairs
+    S1:['LATIN'] <-> S2/S3:['BENGALI']  -- 897 pairs
+    S1:['LATIN'] <-> S2/S3:['TAMIL']  -- 890 pairs
+    S1:['LATIN'] <-> S2/S3:['GUJARATI']  -- 812 pairs
+    S1:['LATIN'] <-> S2/S3:['MALAYALAM']  -- 470 pairs
+    S1:['LATIN'] <-> S2/S3:['ORIYA']  -- 162 pairs
+    S1:['LATIN'] <-> S2/S3:['GURMUKHI']  -- 133 pairs
+
+## 7b. Catch-All Unknown Pattern Discovery
+
+Dynamically discover high-frequency anomalous tokens not covered by predefined patterns.
+This catches unexpected noise patterns specific to this dataset.
+
+S1 -- High-frequency anomalous tokens (candidates for new noise rules):
+  '(india'                 :  44,262 ( 2.01%)  e.g. 'Osprey (India) Development LLP'
+  'p.c'                    :  23,272 ( 1.05%)  e.g. 'WG Harbor Worldwide P.C.'
+  '.c'                     :  21,855 ( 0.99%)  e.g. 'Aggie E. Nagle, L.C.S.W.'
+  'l.l'                    :  21,843 ( 0.99%)  e.g. 'Petronilla Sult Royalties L.L.C.'
+  '.,'                     :  19,086 ( 0.86%)  e.g. 'White, Helge W., DDS'
+S2 -- High-frequency anomalous tokens (candidates for new noise rules):
+  '(india'                 :  80,713 ( 1.60%)  e.g. 'GM (INDIA) FABRICS LTD'
+  '.c'                     :  73,638 ( 1.46%)  e.g. 'SHIVSHAKTI VIDYALAYA VIDYALAYA OVERSEAS CORPORATION | www.sh'
+  'l.l'                    :  72,731 ( 1.44%)  e.g. 'Piedmont Complete Chile  L.L.C.'
+  '.,'                     :  34,215 ( 0.68%)  e.g. 'Kalie Cassidy, O.D.,'
+  'p.c'                    :  26,678 ( 0.53%)  e.g. 'SHAFFER, LOVE + HALL LIGAND P.C. #98587'
+  'm/s'                    :  25,687 ( 0.51%)  e.g. 'M/s Pearl Bróthers Private'
+S3 -- High-frequency anomalous tokens (candidates for new noise rules):
+  '(india'                 :  82,324 ( 1.56%)  e.g. 'Sai  Surgical (India) Ltd'
+  '.c'                     :  69,579 ( 1.32%)  e.g. 'wilfordhancock.com'
+  'l.l'                    :  69,272 ( 1.31%)  e.g. 'Basalt Forefront L.L.C.'
+  '/a'                     :  36,000 ( 0.68%)  e.g. 'Quonex d/b/a M D Herrera Offshore'
+  '.,'                     :  35,013 ( 0.66%)  e.g. 'Barrineau, Kirby, Esq., (PC)'
+  'p.c'                    :  29,837 ( 0.56%)  e.g. 'Sweetbarbershop.Com'
+  'm/s'                    :  29,324 ( 0.55%)  e.g. 'M/s Jd Pvt Ltd Services'
+## 7c. Verification Pass   Full Data Frequency Check
+
+**Purpose**: Verify that pattern frequencies observed in the 200k sample are
+representative of the full dataset. Critical patterns that will drive normalization
+rules are re-counted on the complete data.
+
+**Sampling strategy**: Initial EDA used stratified random samples of 200k records
+per source (~4-9% of training data). This verification pass confirms that
+high-frequency patterns (>1%) have stable frequency estimates before building
+normalization rules.
+
+================================================================================
+VERIFICATION PASS: Pattern frequencies on FULL training data
+================================================================================
+This confirms that sample-based frequencies are representative.
+Only run this after initial EDA to verify patterns you plan to normalize.
+Verifying on train_source2.tsv (full file)...
+  Streaming train_source2.tsv ...
+    ... processed 500,000 rows
+    ... processed 1,000,000 rows
+    ... processed 1,500,000 rows
+    ... processed 2,000,000 rows
+    ... processed 2,500,000 rows
+    ... processed 3,000,000 rows
+    ... processed 3,500,000 rows
+    ... processed 4,000,000 rows
+    ... processed 4,500,000 rows
+    ... processed 5,000,000 rows
+Full data pattern frequencies (n=5,034,616 rows):
+Pattern                      Count  Percentage  Sample vs Full
+---------------------------------------------------------------------------
+all_caps_word         :  1,001,487      19.89%  +0.00% diff
+extra_whitespace      :    554,392      11.01%  +0.00% diff
+url_in_name           :    176,144       3.50%  +0.00% diff
+duplicate_adj_word    :    101,837       2.02%  +0.00% diff
+dba_alias             :         16       0.00%  +0.00% diff
+? Verification complete. Update noise_catalog with full-data frequencies.
+
+

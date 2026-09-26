@@ -1,0 +1,76 @@
+REPO_ROOT    : C:\Users\arula\Documents\Work\ML_challenge
+NORM_DIR     : C:\Users\arula\Documents\Work\ML_challenge\dataset\normalized
+BLOCKING_DIR : C:\Users\arula\Documents\Work\ML_challenge\dataset\blocking
+
+======================================================================
+PHASE 1: MULTI-STRATEGY BLOCKING
+======================================================================
+
+Loading normalized training data ...
+Traceback (most recent call last):
+  File "C:\Users\arula\Documents\Work\ML_challenge\.venv\Lib\site-packages\pandas\compat\_optional.py", line 158, in import_optional_dependency
+    module = importlib.import_module(name)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\arula\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py", line 90, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1381, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1354, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1318, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'pyarrow'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\arula\Documents\Work\ML_challenge\code\business_entity_resolution\src\02_blocking.py", line 133, in _read_norm_tsv
+    return pd.read_csv(path, sep="\t", dtype=str, engine="pyarrow")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\arula\Documents\Work\ML_challenge\.venv\Lib\site-packages\pandas\io\parsers\readers.py", line 872, in read_csv
+    return _read(filepath_or_buffer, kwds)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\arula\Documents\Work\ML_challenge\.venv\Lib\site-packages\pandas\io\parsers\readers.py", line 306, in _read
+    return parser.read(nrows)
+           ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\arula\Documents\Work\ML_challenge\.venv\Lib\site-packages\pandas\io\parsers\readers.py", line 1938, in read
+    df = self._engine.read()  # type: ignore[attr-defined]
+         ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\arula\Documents\Work\ML_challenge\.venv\Lib\site-packages\pandas\io\parsers\arrow_parser_wrapper.py", line 279, in read
+    pa = import_optional_dependency("pyarrow")
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\arula\Documents\Work\ML_challenge\.venv\Lib\site-packages\pandas\compat\_optional.py", line 161, in import_optional_dependency
+    raise ImportError(msg) from err
+ImportError: `Import pyarrow` failed.  Use pip or conda to install the pyarrow package.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\arula\Documents\Work\ML_challenge\code\business_entity_resolution\src\02_blocking.py", line 1019, in <module>
+    main()
+  File "C:\Users\arula\Documents\Work\ML_challenge\code\business_entity_resolution\src\02_blocking.py", line 915, in main
+    train_s1, train_s2, train_s3 = load_normalized("train")
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\arula\Documents\Work\ML_challenge\code\business_entity_resolution\src\02_blocking.py", line 141, in load_normalized
+    s2 = _read_norm_tsv(NORM_DIR / f"{prefix}_source2_norm.tsv")
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\arula\Documents\Work\ML_challenge\code\business_entity_resolution\src\02_blocking.py", line 135, in _read_norm_tsv
+    return pd.read_csv(path, sep="\t", dtype=str, low_memory=False)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\arula\Documents\Work\ML_challenge\.venv\Lib\site-packages\pandas\io\parsers\readers.py", line 872, in read_csv
+    return _read(filepath_or_buffer, kwds)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\arula\Documents\Work\ML_challenge\.venv\Lib\site-packages\pandas\io\parsers\readers.py", line 306, in _read
+    return parser.read(nrows)
+           ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\arula\Documents\Work\ML_challenge\.venv\Lib\site-packages\pandas\io\parsers\readers.py", line 1950, in read
+    ) = self._engine.read(  # type: ignore[attr-defined]
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\arula\Documents\Work\ML_challenge\.venv\Lib\site-packages\pandas\io\parsers\c_parser_wrapper.py", line 244, in read
+    data = self._reader.read(nrows)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "pandas/_libs/parsers.pyx", line 814, in pandas._libs.parsers.TextReader.read
+  File "pandas/_libs/parsers.pyx", line 906, in pandas._libs.parsers.TextReader._read_rows
+  File "pandas/_libs/parsers.pyx", line 885, in pandas._libs.parsers.TextReader._check_tokenize_status
+  File "pandas/_libs/parsers.pyx", line 2082, in pandas._libs.parsers.raise_parser_error
+  File "<frozen codecs>", line 331, in getstate
+KeyboardInterrupt
+^C
